@@ -1,206 +1,65 @@
-import pygame
 import random
-import sys
-from itertools import combinations
-
-WIDTH = 800
-ROWS = 8
-
-RED = pygame.image.load('red.png')
-GREEN = pygame.image.load('green.png')
-
-REDKING = pygame.image.load('redKing.png')
-GREENKING = pygame.image.load('greenKing.png')
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-ORANGE = (235, 168, 52)
-BLUE = (76, 252, 241)
-
-pygame.init()
-WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption('Checkers')
-
-priorMoves = []
 
 
-class Node:
-    def __init__(self, row, col, width):
-        self.row = row
-        self.col = col
-        self.x = int(row * width)
-        self.y = int(col * width)
-        self.colour = WHITE
-        self.piece = None
+class Bojovnik:
+    def __init__(self,jmeno,sila,obratnost, vitalita): #definice magické metody (metoda je funkce, která operuje/manipuluje s nějakým objektem, ovlivňuje jeho vlastnosti,
+        """
+        magická metoda má dvě podtržítka
+        existují pouze v těle objektu, mělo by se k nim přistupovat pouze zevnitř (jakoby private)
+        __init__ je konstruktor třídy - vytvoří instanci objektu a přiřadí mu konkrétní vlastnosti
+        self - skrytý parametr, který umožňuje manipulaci s vlastnostmi objektu
+        """
+        self.jmeno = jmeno #jméno konkrétního bojovníka, zadané parametrem
+        self.sila = sila
+        self.obratnost = obratnost
+        self.vitalita = vitalita
+        self._vek = 50 #jakoby private parametr - měl by být dostupný pouze uvnitř třídy, ale Python to neví
+        self.__vek = 50 #protected parametr
 
-    def draw(self, win):
-        pygame.draw.rect(win, self.colour, (self.x, self.y, WIDTH / ROWS, WIDTH / ROWS))
-        if self.piece:
-            win.blit(self.piece.image, (self.x, self.y))
+    @property #dekorátor označující getter kolem privátního parametru
+    def vek(self):
+        return self._vek
 
+    @vek.setter #dekorátor - setter k privátnímu parametru
+    def vek(self, cislo):
+        self._vek = cislo
 
-def update_display(win, grid, rows, width):
-    for row in grid:
-        for spot in row:
-            spot.draw(win)
-    draw_grid(win, rows, width)
-    pygame.display.update()
+    def bojuj_s(self,nepritel):
+        #pokus o zásah protivníka
+        sance_na_zasah = random.random()*100 #náhodné desetinné čslo od 0 do 100
+        if sance_na_zasah > nepritel.obratnost:
+            zraneni = random.random()*self.sila
+            nepritel.vitalita -= zraneni
 
+    def __gt__(self, nepritel): #greater than
+        return (self.sila+self.obratnost) > (nepritel.sila+nepritel.obratnost)
 
-def make_grid(rows, width):
-    grid = []
-    gap = width // rows
-    count = 0
-    for i in range(rows):
-        grid.append([])
-        for j in range(rows):
-            node = Node(j, i, gap)
-            if abs(i - j) % 2 == 0:
-                node.colour = BLACK
-            if (abs(i + j) % 2 == 0) and (i < 3):
-                node.piece = Piece('R')
-            elif (abs(i + j) % 2 == 0) and i > 4:
-                node.piece = Piece('G')
-            count += 1
-            grid[i].append(node)
-    return grid
+jarda = Bojovnik("Jarda", 80,20,100)
+bojovnik1 = Bojovnik("Biggus",80,20,100)
+bojovnik2 = Bojovnik("Brian", 20,80,100)
 
-
-def draw_grid(win, rows, width):
-    gap = width // ROWS
-    for i in range(rows):
-        pygame.draw.line(win, BLACK, (0, i * gap), (width, i * gap))
-        for j in range(rows):
-            pygame.draw.line(win, BLACK, (j * gap, 0), (j * gap, width))
+print(f"lepší bojovník je {bojovnik1.jmeno if bojovnik1 > bojovnik2 else bojovnik2.jmeno}") #ukázka ternárního operátoru
+while bojovnik1.vitalita > 0 and bojovnik2.vitalita > 0:
+    bojovnik2.bojuj_s(bojovnik1)
+    bojovnik1.bojuj_s(bojovnik2)
 
 
-class Piece:
-    def __init__(self, team):
-        self.team = team
-        self.image = RED if self.team == 'R' else GREEN
-        self.type = None
-
-    def draw(self, x, y):
-        WIN.blit(self.image, (x, y))
+if bojovnik1.vitalita >0:
+    print(f"Souboj vyhrál bojovník {bojovnik1.jmeno} a jeho vitalita po souboji je {bojovnik1.vitalita}.")
+else:
+    print(f"Souboj vyhrál bojovník {bojovnik2.jmeno} a jeho vitalita po souboji je {bojovnik2.vitalita}.")
 
 
-def get_node(grid, rows, width):
-    gap = width // rows
-    row_x, row_y = pygame.mouse.get_pos()
-    row = row_x // gap
-    col = row_y // gap
-    return col, row
+print(jarda.jmeno) #vlastnosti objektu, získání konkrétního parametru, vlastnosti se volají bez závorek
+print(jarda._vek)
+print(jarda.vek)
 
+# dekorátory => funkce kolem funkce => uzávěr
+def skvelyDekorator(funkce): # ukázka dekorátoru
+    funkce()
+    print("Jsem skvělý a provedl jsem tu funkci úplně sám")
 
-def reset_colours(grid, node):
-    positions = generate_potential_moves(node, grid)
-    positions.append(node)
+def pozdrav():
+    print("Ahoj podsvětí")
 
-    for colouredNodes in positions:
-        node_x, node_y = colouredNodes
-        grid[node_x][node_y].colour = BLACK if abs(node_x - node_y) % 2 == 0 else WHITE
-
-
-def highlight_potential_moves(piece_position, grid):
-    positions = generate_potential_moves(piece_position, grid)
-    for position in positions:
-        column, row = position
-        grid[column][row].colour = BLUE
-
-
-def opposite(team):
-    return "R" if team == "G" else "G"
-
-
-def generate_potential_moves(node_position, grid):
-    checker = lambda x, y: 0 <= x + y < 8
-    positions = []
-    column, row = node_position
-    if grid[column][row].piece:
-        vectors = [[1, -1], [1, 1]] if grid[column][row].piece.team == "R" else [[-1, -1], [-1, 1]]
-        if grid[column][row].piece.type == 'KING':
-            vectors = [[1, -1], [1, 1], [-1, -1], [-1, 1]]
-        for vector in vectors:
-            column_vector, row_vector = vector
-            if checker(column_vector, column) and checker(row_vector, row):
-                # grid[(column+column_vector)][(row+row_vector)].colour=ORANGE
-                if not grid[(column + column_vector)][(row + row_vector)].piece:
-                    positions.append((column + column_vector, row + row_vector))
-                elif grid[column + column_vector][row + row_vector].piece and \
-                        grid[column + column_vector][row + row_vector].piece.team == opposite(
-                    grid[column][row].piece.team):
-
-                    if checker((2 * column_vector), column) and checker((2 * row_vector), row) \
-                            and not grid[(2 * column_vector) + column][(2 * row_vector) + row].piece:
-                        positions.append((2 * column_vector + column, 2 * row_vector + row))
-
-    return positions
-
-
-"""
-Error with locating opssible moves row col error
-"""
-
-
-def highlight(clicked_node, grid, old_highlight):
-    column, row = clicked_node
-    grid[column][row].colour = ORANGE
-    if old_highlight:
-        reset_colours(grid, old_highlight)
-    highlight_potential_moves(clicked_node, grid)
-    return column, row
-
-
-def move(grid, piece_position, new_position):
-    reset_colours(grid, piece_position)
-    new_column, new_row = new_position
-    old_column, old_row = piece_position
-
-    piece = grid[old_column][old_row].piece
-    grid[new_column][new_row].piece = piece
-    grid[old_column][old_row].piece = None
-
-    if new_column == 7 and grid[new_column][new_row].piece.team == 'R':
-        grid[new_column][new_row].piece.type = 'KING'
-        grid[new_column][new_row].piece.image = REDKING
-    if new_column == 0 and grid[new_column][new_row].piece.team == 'G':
-        grid[new_column][new_row].piece.type = 'KING'
-        grid[new_column][new_row].piece.image = GREENKING
-    if abs(new_column - old_column) == 2 or abs(new_row - old_row) == 2:
-        grid[int((new_column + old_column) / 2)][int((new_row + old_row) / 2)].piece = None
-        return grid[new_column][new_row].piece.team
-    return opposite(grid[new_column][new_row].piece.team)
-
-
-def main(width, rows):
-    grid = make_grid(rows, width)
-    highlighted_piece = None
-    curr_move = 'G'
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print('EXIT SUCCESSFUL')
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                clicked_node = get_node(grid, rows, width)
-                clicked_position_column, clicked_position_row = clicked_node
-                if grid[clicked_position_column][clicked_position_row].colour == BLUE:
-                    if highlighted_piece:
-                        piece_column, piece_row = highlighted_piece
-                    if curr_move == grid[piece_column][piece_row].piece.team:
-                        reset_colours(grid, highlighted_piece)
-                        curr_move = move(grid, highlighted_piece, clicked_node)
-                elif highlighted_piece == clicked_node:
-                    pass
-                else:
-                    if grid[clicked_position_column][clicked_position_row].piece:
-                        if curr_move == grid[clicked_position_column][clicked_position_row].piece.team:
-                            highlighted_piece = highlight(clicked_node, grid, highlighted_piece)
-
-        update_display(WIN, grid, rows, width)
-
-
-main(WIDTH, ROWS)
+skvelyDekorator(pozdrav)

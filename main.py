@@ -1,7 +1,8 @@
-import pygame
+import pygame, sys
 from checkers.constants import WIDTH, HEIGHT
 from checkers.board import Board
-from checkers.piece import Piece
+from checkers.stone import Stone
+from checkers.game_director import GameDirector
 from checkers.constants import BURLYWOOD, WHITE, SQUARE_SIZE, GREY, BLACK
 
 FPS = 60
@@ -16,11 +17,10 @@ def main():
     clock = pygame.time.Clock()
 
     board = Board()
-    board.create_squares(WIN)
+    game_director = GameDirector(board, WIN)
+    game_director.new_game()
 
-    piece = Piece(board.squares[3], GREY)
 
-    piece.draw_piece(WIN)
 
     while run:
         clock.tick(FPS)
@@ -29,7 +29,9 @@ def main():
                 run = False
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
+                pos = pygame.mouse.get_pos()
+                print(pos)
+                board.get_square_by_pos(pos)
 
         pygame.display.update()
 
@@ -37,3 +39,4 @@ def main():
 
 
 main()
+

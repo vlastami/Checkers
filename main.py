@@ -21,7 +21,6 @@ def main():
     game_director.new_game()
 
 
-
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -31,9 +30,13 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 print(pos)
-                board.get_square_by_pos(pos)
+                clicked_square = board.get_square_by_pos(pos)
+                game_director.handle_click(clicked_square)
+
+
 
         pygame.display.update()
+
 
 
 

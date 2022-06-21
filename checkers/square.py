@@ -8,5 +8,7 @@ class Square:
         self.col = col
         self.color = color
 
+        self.stone = None
+
     def draw(self, win):
-        pygame.draw.rect(win, self.color, (self.row * SQUARE_SIZE, self.col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+        pygame.draw.rect(win, self.color, (self.col * SQUARE_SIZE, self.row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))

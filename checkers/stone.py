@@ -1,7 +1,6 @@
 import pygame.draw
 
 from .constants import BURLYWOOD, WHITE, SQUARE_SIZE, GREY
-from checkers.square import Square
 
 
 class Stone:
@@ -26,3 +25,11 @@ class Stone:
 
         self.square.stone = self #my jsme stone
         self.draw_stone()
+
+    def get_csv_data(self):
+        data = ""
+        if self.color == GREY:
+            data = "b"
+        else:
+            data = "w"
+        return data

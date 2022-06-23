@@ -52,8 +52,7 @@ class Board:
                     "h1": squares[56], "h2": squares[57], "h3": squares[58], "h4": squares[59],
                     "h5": squares[60], "h6": squares[61], "h7": squares[62], "h8": squares[63]}
 
-        for key in self.squares:
-            print(key, self.squares[key].col, self.squares[key].row)
+
 
 
     def get_square_by_pos(self, pos):
@@ -65,5 +64,17 @@ class Board:
 
         for key in self.squares:
             if posx == self.squares[key].col and posy == self.squares[key].row:
-                # print(self.squares[key].col, self.squares[key].row)
+
                 return self.squares[key] # vrací jeden objekt typu square
+
+    def get_csv(self):
+        rows = []
+        for key in self.squares:
+            if self.squares[key].stone is not None:
+                rows.append([self.squares[key].stone.get_csv_data(), key])
+        return rows
+
+
+
+
+

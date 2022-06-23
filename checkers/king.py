@@ -15,3 +15,11 @@ class King(Stone):
 
         pygame.draw.circle(self.win, BLACK, (self.square.col * SQUARE_SIZE + SQUARE_SIZE // 1.96, self.square.row * SQUARE_SIZE+ SQUARE_SIZE // 1.96), radius)
 
+    def get_csv_data(self):
+        data = ""
+        if self.color == GREY:
+            data = "bb"
+        else:
+            data = "ww"
+        return data
+

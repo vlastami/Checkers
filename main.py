@@ -36,20 +36,29 @@ def main():
                 if event.key == pygame.K_F4:
                     game_director.random_move()
                 elif event.key == pygame.K_F5:
-
                     with open('./csv_file', 'w', newline='') as f:
                         writer = csv.writer(f)
                         writer.writerows(board.get_csv())
                 elif event.key == pygame.K_F6:
-                    board.create_squares(WIN)
-                    game_director.white = []
-                    game_director.grey = []
-                    game_director.on_move = game_director.white
-                    with open('./csv_file', 'r') as f:
-                        reader = csv.reader(f)
-                        for row in reader:
-                            game_director.spawn_stone(row)
+                    try:
+                        with open('./csv_file', 'r') as f:
+                            reader = csv.reader(f)
+                            for row in reader:
+                                if len(row) != 2:
 
+                                    raise ValueError
+                            f.seek(0)
+                            board.create_squares(WIN)
+                            game_director.white = []
+                            game_director.grey = []
+                            game_director.on_move = game_director.white
+                            for row in reader:
+                                game_director.spawn_stone(row)
+                    except FileNotFoundError:
+                        print("Soubor nebyl nalezen.")
+                        print("Data k načtení musí být uložena v souboru s názvem csv_file.")
+                    except ValueError:
+                        print("Soubor neni ve spravnem formatu.")
 
 
 

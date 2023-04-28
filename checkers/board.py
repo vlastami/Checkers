@@ -6,7 +6,6 @@ from .square import Square
 class Board:
     def __init__(self):
         self.squares = {}
-        # self.turn = 0
         self.selected_piece = None
 
     def create_squares(self, win):

@@ -161,7 +161,7 @@ class GameDirector:
             return False
         return True
 
-    def is_capturing_move(self):
+    def find_capturing_moves(self):
 
         self.capturing_moves = []
         if self.on_move == self.grey:
@@ -429,7 +429,7 @@ class GameDirector:
             return False
 
     def handle_click(self, clicked_square):
-        self.is_capturing_move()
+        self.find_capturing_moves()
         if clicked_square.stone is not None:
             self.selected_stone = clicked_square.stone
         else:
@@ -472,7 +472,7 @@ class GameDirector:
             square.stone = None
 
     def random_move(self):
-        self.is_capturing_move()
+        self.find_capturing_moves()
 
         if len(self.capturing_moves) > 0:
             random_number = random.randint(0, len(self.capturing_moves) - 1)

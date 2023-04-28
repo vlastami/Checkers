@@ -29,7 +29,6 @@ def main():
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                print(pos)
                 clicked_square = board.get_square_by_pos(pos)
                 game_director.handle_click(clicked_square)
             if event.type == pygame.KEYDOWN:
@@ -71,4 +70,8 @@ def main():
 
 
 main()
+
+
+
+
 
